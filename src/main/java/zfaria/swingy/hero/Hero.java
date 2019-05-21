@@ -2,9 +2,7 @@ package zfaria.swingy.hero;
 
 import zfaria.swingy.Coordinate;
 import zfaria.swingy.Map;
-import zfaria.swingy.artifacts.Armor;
-import zfaria.swingy.artifacts.Helm;
-import zfaria.swingy.artifacts.Weapon;
+import zfaria.swingy.artifacts.*;
 import zfaria.swingy.enemies.Enemy;
 import zfaria.swingy.view.GameView;
 
@@ -27,17 +25,10 @@ public class Hero {
 
     private int attack;
 
-    /*
-     * Defense is a float modifier that decreaes the amount of oncoming damage by a %.
-     */
     private float defense;
 
     private float hitPoints;
 
-    /*
-     * Luck increases chances of a critical hit, (1.5x damage)
-     * Better loot and better odds of escaping.
-     */
     private float luck;
 
     private Armor armor;
@@ -48,9 +39,13 @@ public class Hero {
 
     private Coordinate pos;
 
-    Hero(String name, String className, int experience, String armor, String weapon, String helm) {
+    private ArtifactFactory artifactFactory;
+
+    Hero(String name, String className, int experience, Armor armor, Weapon weapon, Helm helm) {
         this(name, className, experience);
-        // TODO create artifact builder?
+        this.armor = armor;
+        this.weapon = weapon;
+        this.helm = helm;
     }
 
     public Hero(String name, String className) {
@@ -58,9 +53,10 @@ public class Hero {
         updateLevel();
         this.heroClass = HeroClassFactory.getHeroClass(className);
         this.name = name;
-        this.armor = new Armor("armor", 5);
-        this.weapon = new Weapon("weapon", 5);
-        this.helm = new Helm("helm", 5);
+        this.armor = new Armor();
+        this.weapon = new Weapon();
+        this.helm = new Helm();
+        artifactFactory = new ArtifactFactory();
     }
 
     public Hero(String name, String className, int experience) {
@@ -70,13 +66,14 @@ public class Hero {
     }
 
     public void setClassStats() {
-        this.attack = heroClass.getBaseDamage(level);
-        this.defense = heroClass.getBaseDefense(level);
         this.luck = heroClass.getBaseLuck(level);
         this.hitPoints = heroClass.getBaseHitpoints(level);
-        this.hitPoints += helm.getStat();
-        this.attack += weapon.getStat();
-        this.defense += armor.getStat() / 100f;
+        applyArtifacts();
+    }
+
+    public void applyArtifacts() {
+        this.attack = heroClass.getBaseDamage(level) + weapon.getStat();
+        this.defense = heroClass.getBaseDefense(level) + armor.getStat() / 100f;
     }
 
     private void updateLevel() {
@@ -151,29 +148,40 @@ public class Hero {
         return pos;
     }
 
-    public void flee(GameView view, Enemy enemy) {
+    public boolean flee(GameView view, Enemy enemy) {
         Random r = new Random();
         float num = r.nextFloat();
-        float chance = .50f + luck;
-        if (num > chance) {
+        if (num > luck) {
             view.messageUser("You failed to flee!");
-            fight(view, enemy);
+            return fight(view, enemy);
         } else {
             view.messageUser("You successfully fled...");
+            return true;
         }
     }
 
-    public void fight(GameView view, Enemy enemy) {
-        while (enemy.isAlive() && this.isAlive()) {
-            this.hitPoints -= enemy.getDamage() * (1 - this.defense);
+    public boolean fight(GameView view, Enemy enemy) {
+        float ehp = this.hitPoints + helm.getStat();
+        while (enemy.isAlive() && ehp > 0) {
+            ehp -= enemy.getDamage() * (1 - this.defense);
             enemy.takeDamage(this.attack);
+        }
+        if (this.hitPoints > ehp) {
+            this.hitPoints = ehp;
         }
         if (this.isAlive()) {
             view.messageUser("You defeated the " + enemy.getName());
             view.messageUser("You received " + enemy.getExperienceReward() + " XP");
             this.experience += enemy.getExperienceReward();
             updateLevel();
+            heal(enemy.getLevel());
+            return true;
         }
+        return false;
+    }
+
+    private void heal(int level) {
+        this.hitPoints += level;
     }
 
     public boolean isAlive() {
@@ -183,5 +191,16 @@ public class Hero {
     public void reward(int i) {
         this.experience += i;
         updateLevel();
+    }
+
+    public void equip(IArtifact artifact) {
+        if (artifact instanceof Armor) {
+            this.armor = (Armor)artifact;
+        } else if (artifact instanceof Weapon) {
+            this.weapon = (Weapon)artifact;
+        } else if (artifact instanceof Helm) {
+            this.helm = (Helm)artifact;
+        }
+        applyArtifacts();
     }
 }

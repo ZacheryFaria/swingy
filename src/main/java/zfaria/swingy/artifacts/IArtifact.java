@@ -4,6 +4,7 @@ public interface IArtifact {
 
     int getStat();
 
-    String getName();
+    String getType();
 
+    String getStatTranslation();
 }

@@ -1,15 +1,7 @@
 package zfaria.swingy.view;
 
-import com.google.common.io.Files;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
 import zfaria.swingy.Map;
 import zfaria.swingy.hero.Hero;
-
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.Scanner;
 
 public interface GameView  {
 
@@ -50,4 +42,16 @@ public interface GameView  {
      * Clears the screen
      */
     void clearScreen();
+
+    /**
+     * Locks all elements on screen to prevent future input. Game is over.
+     */
+    void lock();
+
+    /**
+     * Needed to hide when changing windows
+     */
+    void hide();
+
+    void show();
 }

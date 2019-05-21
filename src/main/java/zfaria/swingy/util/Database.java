@@ -29,9 +29,9 @@ public class Database {
                     "name text NOT NULL,\n" +
                     "class text NOT NULL,\n" +
                     "experience integer,\n" +
-                    "armor text,\n" +
-                    "helm text,\n" +
-                    "weapon text\n" +
+                    "armor integer,\n" +
+                    "helm integer,\n" +
+                    "weapon integer" +
                     ");";
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
@@ -43,9 +43,10 @@ public class Database {
 
     public boolean heroExists(Hero h) {
         boolean ret;
-        String sql = "SELECT * FROM heroes WHERE name = ?";
+        String sql = "SELECT * FROM heroes WHERE name = ? and class = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, h.getName());
+            stmt.setString(2, h.getHeroClass());
             ResultSet res = stmt.executeQuery();
             ret = !res.isClosed();
             res.close();
@@ -62,20 +63,22 @@ public class Database {
                     "    \"%s\",\n" +
                     "    \"%s\",\n" +
                     "    %d, \n" +
-                    "    \"%s\",\n" +
-                    "    \"%s\",\n" +
-                    "    \"%s\");";
-            sql = String.format(sql, h.getName(), h.getHeroClass(), h.getExperience(), h.getArmor().toString(),
-                    h.getHelm().toString(), h.getWeapon().toString());
+                     "    %d,\n" +
+                     "    %d,\n" +
+                     "    %d);";
+            sql = String.format(sql, h.getName(), h.getHeroClass(), h.getExperience(), h.getArmor().getStat(),
+                    h.getHelm().getStat(),
+                    h.getWeapon().getStat());
         } else {
             sql = "UPDATE heroes SET \n" +
                     "experience = %d," +
-                    "armor = \"%s\"," +
-                    "helm = \"%s\"," +
-                    "weapon = \"%s\"" +
-                    "where name = \"%s\"";
-            sql = String.format(sql, h.getExperience(), h.getArmor().toString(),
-                    h.getHelm().toString(), h.getWeapon().toString(), h.getName());
+                    "armor = \"%d\"," +
+                    "helm = \"%d\"," +
+                    "weapon = \"%d\"" +
+                    "where name = \"%s\" and " +
+                    "class = \"%s\"";
+            sql = String.format(sql, h.getExperience(), h.getArmor().getStat(),
+                    h.getHelm().getStat(), h.getWeapon().getStat(), h.getName(), h.getHeroClass());
         }
         try (Statement stmt = conn.createStatement()) {
             if (heroExists(h)) {
@@ -117,9 +120,9 @@ public class Database {
                 builder.setName(res.getString("name"));
                 builder.setClassName(res.getString("class"));
                 builder.setExperience(res.getInt("experience"));
-                builder.setArmor(res.getString("armor"));
-                builder.setHelm(res.getString("helm"));
-                builder.setWeapon(res.getString("weapon"));
+                builder.setArmor(res.getInt("armor"));
+                builder.setHelm(res.getInt("helm"));
+                builder.setWeapon(res.getInt("weapon"));
                 res.close();
                 return builder.build();
             } else
@@ -129,4 +132,14 @@ public class Database {
         }
     }
 
+    public void deleteHero(Hero h) {
+        String sql = "DELETE FROM heroes WHERE name = ? and class = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, h.getName());
+            stmt.setString(2, h.getHeroClass());
+            stmt.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

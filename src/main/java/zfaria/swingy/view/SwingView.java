@@ -5,6 +5,9 @@ import zfaria.swingy.Map;
 import zfaria.swingy.hero.Hero;
 
 import javax.swing.*;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +15,7 @@ import java.awt.event.ActionListener;
 public class SwingView implements GameView {
 
     private JTextField messageInput;
-    private JTextArea mapDisplay;
+    private JTextPane mapDisplay;
     private JTextArea heroDisplay;
     private JTextArea messageArea;
     private JScrollPane messageAreaPane;
@@ -31,36 +34,37 @@ public class SwingView implements GameView {
     public void init() {
         frame = new JFrame("Swingy");
         frame.setResizable(false);
-        frame.setLocation(200, 200);
+        frame.setLocation(Toolkit.getDefaultToolkit().getScreenSize().width / 2 - 400, 300);
 
         frame.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        c.ipady = 240;
+        c.ipady = 400;
         c.weightx = .1;
         heroDisplay = new JTextArea();
-        heroDisplay.setText("heroDisplay");
         heroDisplay.setEditable(false);
         heroDisplay.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         heroDisplayPane = new JScrollPane(heroDisplay);
         frame.add(heroDisplayPane, c);
 
         c.gridx = 1;
-        mapDisplay = new JTextArea();
-        mapDisplay.setText("mapDisplay");
+        mapDisplay = new JTextPane();
         mapDisplay.setEditable(false);
+        mapDisplay.setFont(new Font("monospaced", Font.PLAIN, 8));
         mapDisplay.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         mapDisplayPane = new JScrollPane(mapDisplay);
+        StyledDocument doc = mapDisplay.getStyledDocument();
+        SimpleAttributeSet center = new SimpleAttributeSet();
+        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+        doc.setParagraphAttributes(0, doc.getLength(), center, false);
         frame.add(mapDisplayPane, c);
-
 
         c.gridx = 0;
         c.gridy = 1;
         c.gridwidth = 2;
         messageArea = new JTextArea();
         messageArea.setEditable(false);
-        messageArea.setText("messageArea");
         messageArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         messageAreaPane = new JScrollPane(messageArea);
         messageAreaPane.setAutoscrolls(true);
@@ -94,7 +98,7 @@ public class SwingView implements GameView {
                 // We sleep to allow the cpu to 'breathe', won't return promptly otherwise.
                 Thread.sleep(10L);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e); // not really sure what happened or why
+                throw new RuntimeException(e);
             }
         }
         String tmp = inputMessage;
@@ -113,8 +117,10 @@ public class SwingView implements GameView {
         String fmtstr = "Name: %s\nClass: %s\nLevel: %d\nExperience: %d\nAttack Damage: %d + %d\n" +
                 "Hit Points: %.2f + %d\nDefense: %.0f%% + %d%%\nLuck: %.0f%%";
         String res = String.format(fmtstr, h.getName(), h.getHeroClass(), h.getLevel(), h.getExperience(),
-                h.getAttack(), h.getWeapon().getStat(),
-                h.getHitPoints(), h.getHelm().getStat(), h.getDefense() * 100, h.getArmor().getStat(), h.getLuck() * 100);
+                h.getAttack() - h.getWeapon().getStat(), h.getWeapon().getStat(),
+                h.getHitPoints(), h.getHelm().getStat(),
+                h.getDefense() * 100 - h.getArmor().getStat(), h.getArmor().getStat(),
+                h.getLuck() * 100);
         heroDisplay.setText(res);
     }
 
@@ -145,5 +151,21 @@ public class SwingView implements GameView {
     @Override
     public void clearScreen() {
         messageArea.setText("");
+    }
+
+    @Override
+    public void lock() {
+        messageInput.setEditable(false);
+    }
+
+    @Override
+    public void hide() {
+        frame.dispose();
+    }
+
+    @Override
+    public void show() {
+        frame.setVisible(true);
+        frame.setEnabled(true);
     }
 }

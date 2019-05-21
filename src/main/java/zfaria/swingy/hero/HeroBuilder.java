@@ -1,5 +1,9 @@
 package zfaria.swingy.hero;
 
+import zfaria.swingy.artifacts.Armor;
+import zfaria.swingy.artifacts.Helm;
+import zfaria.swingy.artifacts.Weapon;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -13,9 +17,9 @@ public class HeroBuilder {
     private String name;
     private String className;
     private int experience;
-    private String armor;
-    private String helm;
-    private String weapon;
+    private Armor armor;
+    private Helm helm;
+    private Weapon weapon;
 
     public HeroBuilder() {
     }
@@ -35,23 +39,23 @@ public class HeroBuilder {
         return this;
     }
 
-    public HeroBuilder setArmor(String armor) {
-        this.armor = armor;
+    public HeroBuilder setArmor(int stat) {
+        this.armor = new Armor(stat);
         return this;
     }
 
-    public HeroBuilder setHelm(String helm) {
-        this.helm = helm;
+    public HeroBuilder setHelm(int stat) {
+        this.helm = new Helm(stat);
         return this;
     }
 
-    public HeroBuilder setWeapon(String weapon) {
-        this.weapon = weapon;
+    public HeroBuilder setWeapon(int stat) {
+        this.weapon = new Weapon(stat);
         return this;
     }
 
     public Hero build() {
-        Hero h = new Hero(name, className, experience, armor, helm, weapon);
+        Hero h = new Hero(name, className, experience, armor, weapon, helm);
         return h;
     }
 }

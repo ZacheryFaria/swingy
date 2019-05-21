@@ -1,10 +1,14 @@
 package zfaria.swingy;
 
+import zfaria.swingy.artifacts.Artifact;
+import zfaria.swingy.artifacts.ArtifactFactory;
+import zfaria.swingy.artifacts.IArtifact;
 import zfaria.swingy.command.*;
 import zfaria.swingy.enemies.Enemy;
 import zfaria.swingy.hero.Hero;
 import zfaria.swingy.util.Database;
 import zfaria.swingy.view.GameView;
+import zfaria.swingy.view.ViewFactory;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -33,14 +37,25 @@ public class Game {
 
     private static java.util.Map<String, IGameCommand> commands;
 
+    private ArtifactFactory artifactFactory;
+
+    private boolean gameOver = false;
+
     static {
         commands = new HashMap<String, IGameCommand>();
         commands.put("save", new CommandSave());
         commands.put("exit", new CommandExit());
         commands.put("north", new CommandMoveNorth());
+        commands.put("n", new CommandMoveNorth());
         commands.put("south", new CommandMoveSouth());
+        commands.put("s", new CommandMoveSouth());
         commands.put("east", new CommandMoveEast());
+        commands.put("e", new CommandMoveEast());
         commands.put("west", new CommandMoveWest());
+        commands.put("w", new CommandMoveWest());
+        commands.put("help", new CommandHelp());
+        commands.put("console", new CommandConsole());
+        commands.put("gui", new CommandGUI());
     }
 
     public Game(GameView view) {
@@ -48,14 +63,15 @@ public class Game {
 
         database = new Database(Database._dbURL);
 
+        artifactFactory = new ArtifactFactory();
         view.init();
         view.clearScreen();
         hero = chooseHero();
         map = new Map(hero.getLevel());
         hero.setStartingPosition(map);
         hero.setClassStats();
-        mainLoop();
         view.clearScreen();
+        mainLoop();
     }
 
     private void mainLoop() {
@@ -68,7 +84,8 @@ public class Game {
         } else {
             view.messageUser("Invalid command: " + input);
         }
-        mainLoop();
+        if (!gameOver)
+            mainLoop();
     }
 
     private Hero chooseHero() {
@@ -154,15 +171,36 @@ public class Game {
 
     public void fight(Hero h, Enemy enemy) {
         view.messageUser("You encountered an enemy!\n" + enemy);
-        String input = view.promptUser("Do you wish to fight, or flee?");
+        String input = view.promptUser("Do you wish to fight, or flee? (Y/N)");
         input = input.toLowerCase();
-        if (input.equals("fight")) {
-            h.fight(view, enemy);
-        } else if (input.equals("flee")) {
-            h.flee(view, enemy);
+        boolean result = true;
+        if (input.equals("fight") || input.equals("y")) {
+            result = h.fight(view, enemy);
+        } else if (input.equals("flee") || input.equals("n")) {
+            result = h.flee(view, enemy);
         } else {
             view.messageUser("Invalid command " + input);
             fight(h, enemy);
+            return ; // Because we recurse, we don't want to spawn multiple items.
+        }
+        view.updateHeroData(hero);
+        view.updateMapData(map, hero);
+        if (result && input.equals("fight")) { // we only reward when they fight
+            IArtifact artifact = artifactFactory.getRandomArtifact(enemy.getLevel());
+            if (artifact != null) {
+                view.messageUser("You found a " + artifact.getType());
+                view.messageUser("With stats of " + artifact.getStatTranslation());
+                String choice = view.promptUser("Do you wish to keep? (Y/N)");
+                if (choice.toLowerCase().equals("y")) {
+                    h.equip(artifact);
+                }
+            }
+        } else {
+            view.clearScreen();
+            view.messageUser("You died! D:");
+            database.deleteHero(h);
+            view.lock();
+            this.gameOver = true;
         }
         view.updateHeroData(hero);
         view.updateMapData(map, hero);
@@ -181,5 +219,16 @@ public class Game {
         hero.setStartingPosition(map);
         hero.reward(map.getSize() / 2 * 100);
         hero.setClassStats();
+    }
+
+    public GameView getView() {
+        return view;
+    }
+
+    public void setView(int viewid) {
+        this.view.hide();
+        this.view = ViewFactory.getView(viewid);
+        view.init();
+        view.clearScreen();
     }
 }

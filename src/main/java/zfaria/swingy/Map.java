@@ -1,6 +1,7 @@
 package zfaria.swingy;
 
 import zfaria.swingy.enemies.Enemy;
+import zfaria.swingy.enemies.EnemyFactory;
 
 import java.util.Random;
 
@@ -13,6 +14,9 @@ public class Map {
     private boolean visited[][];
 
     private int enemyCount;
+
+
+    private EnemyFactory ef;
 
     private static final float density = .5f;
 
@@ -27,6 +31,8 @@ public class Map {
 
         enemyCount = (int)((size * size) * density);
 
+        ef = new EnemyFactory(level);
+
         populateMap();
     }
 
@@ -38,7 +44,7 @@ public class Map {
             if (enemyExists(new Coordinate(x, y)) || (x == size / 2 && y == size / 2)) {
                 i--;
             } else {
-                enemies[y][x] = new Enemy("test", 1, 1, 1, 100); // TODO
+                enemies[y][x] = ef.getRandomEnemy();
             }
         }
     }
