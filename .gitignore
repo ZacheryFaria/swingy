@@ -1,0 +1,9 @@
+*.class
+.vscode
+sources.txt
+.idea/
+bin/
+simulation.txt
+swingy.iml
+target/
+swingy.db
