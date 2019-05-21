@@ -185,7 +185,7 @@ public class Game {
         }
         view.updateHeroData(hero);
         view.updateMapData(map, hero);
-        if (result && input.equals("fight")) { // we only reward when they fight
+        if (result && (input.equals("fight") || input.equals("y"))) { // we only reward when they fight
             IArtifact artifact = artifactFactory.getRandomArtifact(enemy.getLevel());
             if (artifact != null) {
                 view.messageUser("You found a " + artifact.getType());

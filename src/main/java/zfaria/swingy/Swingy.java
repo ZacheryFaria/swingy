@@ -12,9 +12,11 @@ public class Swingy {
             if (args[0].equals("gui"))
                 new Game(new SwingView());
             else if (args[0].equals("console"))
-                new Game(new SwingView());
-        }
-        System.out.println("Invalid options. gui or console expected.");
+                new Game(new ConsoleView());
+            else
+                System.out.println("Invalid options. gui or console expected.");
+        } else
+            System.out.println("Invalid options. gui or console expected.");
     }
 
 }
