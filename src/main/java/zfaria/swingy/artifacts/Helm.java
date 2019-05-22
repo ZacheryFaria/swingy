@@ -1,7 +1,7 @@
 package zfaria.swingy.artifacts;
 
 public class Helm extends Artifact {
-    public Helm(int stat) {
+    public Helm(float stat) {
         super(stat);
     }
 

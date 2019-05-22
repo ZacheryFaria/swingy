@@ -16,12 +16,12 @@ public class HeroClassRogue implements HeroClass {
 
     @Override
     public float getBaseHitpoints(int level) {
-        return (15) + (level * 4);
+        return (15) + (level * 3);
     }
 
     @Override
     public float getBaseDefense(int level) {
-        return (.02f) + (level * .03f);
+        return (.02f) + (level * .009f);
     }
 
     @Override

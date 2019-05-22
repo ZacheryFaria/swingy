@@ -66,9 +66,9 @@ public class Database {
                      "    %d,\n" +
                      "    %d,\n" +
                      "    %d);";
-            sql = String.format(sql, h.getName(), h.getHeroClass(), h.getExperience(), h.getArmor().getStat(),
-                    h.getHelm().getStat(),
-                    h.getWeapon().getStat());
+            sql = String.format(sql, h.getName(), h.getHeroClass(), h.getExperience(), h.getArmor().getBaseStat(),
+                    h.getHelm().getBaseStat(),
+                    h.getWeapon().getBaseStat());
         } else {
             sql = "UPDATE heroes SET \n" +
                     "experience = %d," +
@@ -77,8 +77,8 @@ public class Database {
                     "weapon = \"%d\"" +
                     "where name = \"%s\" and " +
                     "class = \"%s\"";
-            sql = String.format(sql, h.getExperience(), h.getArmor().getStat(),
-                    h.getHelm().getStat(), h.getWeapon().getStat(), h.getName(), h.getHeroClass());
+            sql = String.format(sql, h.getExperience(), h.getArmor().getBaseStat(),
+                    h.getHelm().getBaseStat(), h.getWeapon().getBaseStat(), h.getName(), h.getHeroClass());
         }
         try (Statement stmt = conn.createStatement()) {
             if (heroExists(h)) {

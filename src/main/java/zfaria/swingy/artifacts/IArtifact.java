@@ -2,7 +2,11 @@ package zfaria.swingy.artifacts;
 
 public interface IArtifact {
 
-    int getStat();
+    float getStat();
+
+    int getBaseStat();
+
+    void updateLuck(float luck);
 
     String getType();
 

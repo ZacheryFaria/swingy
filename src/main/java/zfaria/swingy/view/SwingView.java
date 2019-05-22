@@ -114,8 +114,8 @@ public class SwingView implements GameView {
 
     @Override
     public void updateHeroData(Hero h) {
-        String fmtstr = "Name: %s\nClass: %s\nLevel: %d\nExperience: %d\nAttack Damage: %d + %d\n" +
-                "Hit Points: %.2f + %d\nDefense: %.0f%% + %d%%\nLuck: %.0f%%";
+        String fmtstr = "Name: %s\nClass: %s\nLevel: %d\nExperience: %d\nAttack Damage: %.2f + %.2f\n" +
+                "Hit Points: %.2f + %.2f\nDefense: %.2f%% + %.2f%%\nLuck: %.0f%%";
         String res = String.format(fmtstr, h.getName(), h.getHeroClass(), h.getLevel(), h.getExperience(),
                 h.getAttack() - h.getWeapon().getStat(), h.getWeapon().getStat(),
                 h.getHitPoints(), h.getHelm().getStat(),

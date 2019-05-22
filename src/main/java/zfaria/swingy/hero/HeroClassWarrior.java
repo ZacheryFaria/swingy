@@ -7,7 +7,7 @@ package zfaria.swingy.hero;
 public class HeroClassWarrior implements HeroClass {
     @Override
     public int getBaseDamage(int level) {
-        return (6) + (level * 1);
+        return (3) + (level * 1);
     }
 
     @Override
@@ -17,12 +17,12 @@ public class HeroClassWarrior implements HeroClass {
 
     @Override
     public float getBaseHitpoints(int level) {
-        return (25) + (level * 5);
+        return (25) + (level * 4f);
     }
 
     @Override
     public float getBaseDefense(int level) {
-        return (.1f) + (level * .05f);
+        return (.1f) + (level * .0125f);
     }
 
     @Override

@@ -16,12 +16,12 @@ public class HeroClassMage implements HeroClass {
 
     @Override
     public float getBaseHitpoints(int level) {
-        return (15) + (level * 3);
+        return (15) + (level * 2.5f);
     }
 
     @Override
     public float getBaseDefense(int level) {
-        return (.02f) + (level * .025f);
+        return (.02f) + (level * .005f);
     }
 
     @Override

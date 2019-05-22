@@ -56,6 +56,9 @@ public class Game {
         commands.put("help", new CommandHelp());
         commands.put("console", new CommandConsole());
         commands.put("gui", new CommandGUI());
+        commands.put("stat", new CommandStat());
+        commands.put("map", new CommandMap());
+        commands.put("clear", new CommandClear());
     }
 
     public Game(GameView view) {
@@ -195,7 +198,7 @@ public class Game {
                     h.equip(artifact);
                 }
             }
-        } else {
+        } else if (!hero.isAlive()) {
             view.clearScreen();
             view.messageUser("You died! D:");
             database.deleteHero(h);

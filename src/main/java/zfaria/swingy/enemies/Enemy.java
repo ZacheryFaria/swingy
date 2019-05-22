@@ -38,7 +38,7 @@ public class Enemy {
         return level;
     }
 
-    public void takeDamage(int attack) {
+    public void takeDamage(float attack) {
         this.hitPoints -= attack;
     }
 

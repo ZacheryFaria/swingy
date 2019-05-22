@@ -23,7 +23,7 @@ public class Hero {
 
     private int experience;
 
-    private int attack;
+    private float attack;
 
     private float defense;
 
@@ -72,6 +72,9 @@ public class Hero {
     }
 
     public void applyArtifacts() {
+        this.armor.updateLuck(luck);
+        this.weapon.updateLuck(luck);
+        this.helm.updateLuck(luck);
         this.attack = heroClass.getBaseDamage(level) + weapon.getStat();
         this.defense = heroClass.getBaseDefense(level) + armor.getStat() / 100f;
     }
@@ -112,7 +115,7 @@ public class Hero {
         return experience;
     }
 
-    public int getAttack() {
+    public float getAttack() {
         return attack;
     }
 
@@ -151,7 +154,9 @@ public class Hero {
     public boolean flee(GameView view, Enemy enemy) {
         Random r = new Random();
         float num = r.nextFloat();
-        if (num > luck) {
+        float escapeChance = .5f * (1f + luck);
+        escapeChance = Math.min(escapeChance, .9f);
+        if (num > escapeChance) {
             view.messageUser("You failed to flee!");
             return fight(view, enemy);
         } else {
@@ -194,6 +199,7 @@ public class Hero {
     }
 
     public void equip(IArtifact artifact) {
+        artifact.updateLuck(luck);
         if (artifact instanceof Armor) {
             this.armor = (Armor)artifact;
         } else if (artifact instanceof Weapon) {

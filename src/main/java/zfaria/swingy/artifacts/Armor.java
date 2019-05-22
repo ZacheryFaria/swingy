@@ -1,7 +1,7 @@
 package zfaria.swingy.artifacts;
 
 public class Armor extends Artifact {
-    public Armor(int stat) {
+    public Armor(float stat) {
         super(stat);
     }
 
